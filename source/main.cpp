@@ -39,61 +39,24 @@ int main()
         return -1;
     }
 
-    std::vector<float> vertices = {
-            -0.5f, -0.5f, 0.0f,
-            0.5f, -0.5f, 0.0f,
-            0.0f,  0.5f, 0.0f
-    };
-
     Scene scene(window);
-    Model m(std::move(vertices));
-    Model m2(std::vector<float> {
-        -1.0f,-1.0f,-1.0f, // triangle 1 : begin
-        -1.0f,-1.0f, 1.0f,
-        -1.0f, 1.0f, 1.0f, // triangle 1 : end
-        1.0f, 1.0f,-1.0f, // triangle 2 : begin
-        -1.0f,-1.0f,-1.0f,
-        -1.0f, 1.0f,-1.0f, // triangle 2 : end
-        1.0f,-1.0f, 1.0f,
-        -1.0f,-1.0f,-1.0f,
-        1.0f,-1.0f,-1.0f,
-        1.0f, 1.0f,-1.0f,
-        1.0f,-1.0f,-1.0f,
-        -1.0f,-1.0f,-1.0f,
-        -1.0f,-1.0f,-1.0f,
-        -1.0f, 1.0f, 1.0f,
-        -1.0f, 1.0f,-1.0f,
-        1.0f,-1.0f, 1.0f,
-        -1.0f,-1.0f, 1.0f,
-        -1.0f,-1.0f,-1.0f,
-        -1.0f, 1.0f, 1.0f,
-        -1.0f,-1.0f, 1.0f,
-        1.0f,-1.0f, 1.0f,
-        1.0f, 1.0f, 1.0f,
-        1.0f,-1.0f,-1.0f,
-        1.0f, 1.0f,-1.0f,
-        1.0f,-1.0f,-1.0f,
-        1.0f, 1.0f, 1.0f,
-        1.0f,-1.0f, 1.0f,
-        1.0f, 1.0f, 1.0f,
-        1.0f, 1.0f,-1.0f,
-        -1.0f, 1.0f,-1.0f,
-        1.0f, 1.0f, 1.0f,
-        -1.0f, 1.0f,-1.0f,
-        -1.0f, 1.0f, 1.0f,
-        1.0f, 1.0f, 1.0f,
-        -1.0f, 1.0f, 1.0f,
-        1.0f,-1.0f, 1.0f
-    });
-    DrawableObject o(m);
-    auto v = std::vector<float>(&sphere[0], &sphere[sizeof sphere / sizeof sphere[0] - 1]);
-    Model sp(v);
-    //scene.add_object(o);
-    //scene.add_object(DrawableObject(&m2));
-    auto xd = DrawableObject(sp);
-    xd.set_position({ 3.0, 0.0, 0.0});
-    scene.add_object(xd);
-    scene.render();
+    int choice = 0;
+    switch (choice) {
+        case 0:
+            auto v = std::vector<float>(&sphere[0], &sphere[sizeof sphere / sizeof sphere[0] - 1]);
+            Model sp(v);
+            std::vector<DrawableObject> objs { DrawableObject(sp, "noLight"), DrawableObject(sp, "phong"), DrawableObject(sp, "phong"), DrawableObject(sp, "phong") };
+            objs[0].set_position( { 3.0, 0.0, 0.0 });
+            objs[1].set_position({ -3.0, 0.0, 0.0 });
+            objs[2].set_position({ 0.0, 3.0, 0.0 });
+            objs[3].set_position({0.0, -3.0, 0.0});
+            for (auto o : objs) {
+                scene.add_object(std::move(o));
+            }
+
+            scene.render();
+        break;
+    }
 
     glfwTerminate();
     return 0;

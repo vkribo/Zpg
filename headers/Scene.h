@@ -12,20 +12,22 @@
 #include "Shader.h"
 #include "Camera.h"
 #include "DrawableObject.h"
+#include "ShaderLoader.h"
 
 const unsigned int SCR_WIDTH = 800;
 const unsigned int SCR_HEIGHT = 600;
 
 class Scene : public Subject {
     GLFWwindow* window;
-    Shader shader;
+    ShaderLoader loader;
     std::vector<std::unique_ptr<DrawableObject>> objects;
     Camera camera;
     glm::mat4 projection;
-    glm::mat4 view;
+    //glm::mat4 view;
     float lastX = 400, lastY = 300;
     bool firstMouse = true;
     float pitch = 0, yaw = -90;
+    void load_shaders();
 public:
     explicit Scene(GLFWwindow* window);
     void set_transformations();

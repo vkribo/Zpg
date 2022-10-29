@@ -34,7 +34,7 @@ add_executable(zpg
         source/main.cpp
         source/Shader.cpp
         source/Model.cpp
-        source/DrawableObject.cpp source/Scene.cpp source/Transformation.cpp source/Observer.cpp)
+        source/DrawableObject.cpp source/Scene.cpp source/Transformation.cpp source/Observer.cpp source/Camera.cpp source/ShaderLoader.cpp)
 target_link_libraries(zpg
         ${OPENGL_LIBRARY} # filled by "find_package(OpenGL REQUIRED)"
         ${GLFW_LIBRARY}
@@ -73,3 +73,9 @@ if(SOME_STUFF)
             -DCOMPILE_WITH_SOME_PREPROCESSOR_DIRECTIVE
     )
 endif(SOME_STUFF)
+
+add_custom_command(TARGET zpg POST_BUILD
+        COMMAND ${CMAKE_COMMAND} -E copy_directory
+        ${CMAKE_SOURCE_DIR}/shaders/ $<TARGET_FILE_DIR:zpg>/shaders)
+
+add_dependencies(zpg shaders/noLight.frag shaders/noLight.vert shaders/phong.frag shaders/phong.vert)

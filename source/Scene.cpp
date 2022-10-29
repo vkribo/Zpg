@@ -17,27 +17,57 @@ const char *vertexShaderSource = "#version 330 core\n"
 const char *fragmentShaderSource = "#version 330 core\n"
                                    "in vec3 FragPos;\n"
                                    "in vec3 Normal;\n"
+                                   "uniform vec3 viewPos;\n"
                                    "out vec4 FragColor;\n"
                                    "void main()\n"
                                    "{\n"
                                    "   vec3 lightColor = vec3(1.0f, 1.0f, 1.0f);\n"
-                                   "   float ambientStrength = 0.1f;\n"
+                                   "   float ambientStrength = 0.2f;\n"
                                    "   vec3 ambient = ambientStrength * lightColor;\n"
-                                   "   vec3 lightPos = vec3(100.0f, 100.0f, 100.0f);\n"
+                                   "   vec3 lightPos = vec3(0.f, 0.f, 0.f);\n"
                                    "   vec3 norm = normalize(Normal);\n"
                                    "   vec3 lightDir = normalize(lightPos - FragPos);\n"
                                    "   float diff = max(dot(norm, lightDir), 0.0);\n"
                                    "   vec3 objectColor = vec3(0.f, 0.3f, 0.5f);\n"
                                    "   vec3 diffuse = diff * lightColor;\n"
-                                   "   vec3 result = (ambient + diffuse) * objectColor;\n"
-                                   "   FragColor = vec4(result, 1.0);"
+                                   "   float specularStrength = 0.5;\n"
+                                   "   vec3 viewDir = normalize(viewPos - FragPos);\n"
+                                   "   vec3 reflectDir = reflect(-lightDir, norm);\n"
+                                   "   float spec = pow(max(dot(viewDir, reflectDir), 0.0), 32);\n"
+                                   "   vec3 specular = (dot(norm, lightDir) < 0.0)? vec3(0.0) : specularStrength * spec * lightColor;\n"
+                                   "   vec3 result = (ambient + diffuse + specular) * objectColor;\n"
+                                   "   FragColor = vec4(result, 1.0);\n"
+                                   "}\n\0";
+
+const char *fragmentShaderSourceH1WithCheck = "#version 330 core\n"
+                                   "in vec3 FragPos;\n"
+                                   "in vec3 Normal;\n"
+                                   "uniform vec3 viewPos;\n"
+                                   "out vec4 FragColor;\n"
+                                   "void main()\n"
+                                   "{\n"
+                                   "   vec3 lightColor = vec3(1.0f, 1.0f, 1.0f);\n"
+                                   "   float ambientStrength = 0.2f;\n"
+                                   "   vec3 ambient = ambientStrength * lightColor;\n"
+                                   "   vec3 lightPos = vec3(0.f, 0.f, 0.f);\n"
+                                   "   vec3 norm = normalize(Normal);\n"
+                                   "   vec3 lightDir = normalize(lightPos - FragPos);\n"
+                                   "   float diff = max(dot(norm, lightDir), 0.0);\n"
+                                   "   vec3 objectColor = vec3(0.f, 0.3f, 0.5f);\n"
+                                   "   vec3 diffuse = diff * lightColor;\n"
+                                   "   float specularStrength = 0.5;\n"
+                                   "   vec3 viewDir = normalize(viewPos - FragPos);\n"
+                                   "   vec3 reflectDir = reflect(-lightDir, norm);\n"
+                                   "   float spec = pow(max(dot(viewDir, reflectDir), 0.0), 1);\n"
+                                   "   vec3 specular = (dot(norm, lightDir) < 0.0)? vec3(0.0) : specularStrength * spec * lightColor;\n"
+                                   "   vec3 result = (ambient + diffuse + specular) * objectColor;\n"
+                                   "   FragColor = vec4(result, 1.0);\n"
                                    "}\n\0";
 
 Scene::Scene(GLFWwindow *window) :
         window(window),
-        shader({ std::make_pair(vertexShaderSource, ShaderType::VERTEX), std::make_pair(fragmentShaderSource, ShaderType::FRAGMENT) }),
-        projection(),
-        view()
+        //shader({ std::make_pair(vertexShaderSource, ShaderType::VERTEX), std::make_pair(fragmentShaderSource, ShaderType::FRAGMENT) }),
+        projection()
 {
     //glfwSetInputMode(window, GLFW_CURSOR, GLFW_CURSOR_DISABLED);
     glfwSetWindowUserPointer(window, this);
@@ -49,28 +79,50 @@ Scene::Scene(GLFWwindow *window) :
 }
 
 void Scene::set_transformations() {
-    glUniformMatrix4fv(glGetUniformLocation(shader.get_program_id(), "gProjection"), 1, GL_FALSE, &projection[0][0]);
-    glUniformMatrix4fv(glGetUniformLocation(shader.get_program_id(), "gView"), 1, GL_FALSE, &view[0][0]);
+    notify(UpdateValueInfo(EventType::SET_SHADER_PROJECTION, projection));
 }
 
 void Scene::render() {
     glEnable(GL_DEPTH_TEST);
-    projection = glm::perspective(glm::radians(45.0f), (float)SCR_WIDTH / (float)SCR_HEIGHT, 0.1f, 100.0f);
+    loader.load();
+    for (const auto& s : loader.shaders_ref()) {
+        attach(s.second.get());
+        camera.attach(s.second.get());
+    }
+    int scr_width, scr_height;
+    bool first = true;
     while (!glfwWindowShouldClose(window))
     {
+        glfwGetWindowSize(window, &scr_width, &scr_height);
+        projection = glm::perspective(glm::radians(45.0f), (float)scr_width / (float)scr_height, 0.1f, 100.0f);
+
         // input
         // -----
         processInput(window);
-
 
         // render
         // ------
         glClearColor(0.2f, 0.3f, 0.3f, 1.0f);
         glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
-        //glClearDepth(1);
-        view = glm::lookAt(camera.pos, camera.pos + camera.target, camera.up);
-        set_transformations();
-        notify({ EventType::DRAW });
+        for (const auto& o : objects) {
+            auto s = loader.get(o->shaderName);
+            s->use();
+            set_transformations();
+            camera.update_view();
+            o->shader = s;
+            o->draw_object();
+            s->unuse();
+        }
+
+        if (first) {
+            camera.update_view();
+            first = false;
+        }
+
+        //for (const auto& s : loader.shaders_ref()) {
+          //  detach(s.second.get());
+            //camera.detach(s.second.get());
+        //}
 
         // glfw: swap buffers and poll IO events (keys pressed/released, mouse moved etc.)
         // -------------------------------------------------------------------------------
@@ -81,18 +133,17 @@ void Scene::render() {
 
 void Scene::add_object(DrawableObject obj) {
     auto u = std::make_unique<DrawableObject>(std::move(obj));
-    attach(u.get());
     objects.push_back(std::move(u));
-    notify(UpdateValueInfo<Shader*>(EventType::SET_SHADER, &shader));
+    //notify(UpdateValueInfo<Shader*>(EventType::SET_SHADER, &shader));
 }
 
 void Scene::processInput(GLFWwindow *window) {
     if (glfwGetKey(window, GLFW_KEY_ESCAPE) == GLFW_PRESS)
         glfwSetWindowShouldClose(window, true);
     const float cameraSpeed = 0.05f; // adjust accordingly
-    auto& cameraPos = camera.pos;
-    auto& cameraFront = camera.target;
-    auto& cameraUp = camera.up;
+    auto cameraPos = camera.get_pos();
+    auto cameraFront = camera.get_target();
+    auto cameraUp = camera.get_up();
     if (glfwGetKey(window, GLFW_KEY_W) == GLFW_PRESS)
         cameraPos += cameraSpeed * cameraFront;
     if (glfwGetKey(window, GLFW_KEY_S) == GLFW_PRESS)
@@ -101,6 +152,8 @@ void Scene::processInput(GLFWwindow *window) {
         cameraPos -= glm::normalize(glm::cross(cameraFront, cameraUp)) * cameraSpeed;
     if (glfwGetKey(window, GLFW_KEY_D) == GLFW_PRESS)
         cameraPos += glm::normalize(glm::cross(cameraFront, cameraUp)) * cameraSpeed;
+
+    camera.set_pos(cameraPos);
 }
 
 void Scene::mouse_callback(float xpos, float ypos) {
@@ -132,5 +185,10 @@ void Scene::mouse_callback(float xpos, float ypos) {
     direction.x = cos(glm::radians(yaw)) * cos(glm::radians(pitch));
     direction.y = sin(glm::radians(pitch));
     direction.z = sin(glm::radians(yaw)) * cos(glm::radians(pitch));
-    camera.target = glm::normalize(direction);
+    camera.set_target(glm::normalize(direction));
 }
+
+void Scene::load_shaders() {
+
+}
+

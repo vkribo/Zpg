@@ -8,6 +8,6 @@ struct UpdateInfo {
 
 template<class T>
 struct UpdateValueInfo : public UpdateInfo {
-    T value;
-    UpdateValueInfo(EventType type, T value) : UpdateInfo(type), value(value) {}
+    const T& value;
+    UpdateValueInfo(EventType type, const T& value) : UpdateInfo(type), value(value) {}
 };
