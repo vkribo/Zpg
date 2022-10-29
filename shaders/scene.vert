@@ -8,7 +8,7 @@ out vec3 FragPos;
 out vec3 Normal;
 void main()
 {
-   gl_Position = gProjection * gView * (gModel * vec4(aPos.x, aPos.y, aPos.z, 1.0));
-   FragPos = vec3(gModel * vec4(aPos, 1.0));
-   Normal = mat3(transpose(inverse(gModel))) * aNormal;
+    gl_Position = gProjection * gView * (gModel * vec4(aPos.x, aPos.y, aPos.z, 1.0));
+    FragPos = vec3(gModel * vec4(aPos, 1.0));
+    Normal = mat3(transpose(inverse(gModel))) * aNormal;
 }

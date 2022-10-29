@@ -29,6 +29,9 @@ include_directories(
         ${GLM_INCLUDE_PATH}
 )
 
+add_compile_options(-fsanitize=address)
+add_link_options(-fsanitize=address)
+
 add_executable(zpg
         source/glad.c
         source/main.cpp
@@ -74,8 +77,13 @@ if(SOME_STUFF)
     )
 endif(SOME_STUFF)
 
-add_custom_command(TARGET zpg POST_BUILD
+add_custom_target(copy_shaders ALL
         COMMAND ${CMAKE_COMMAND} -E copy_directory
-        ${CMAKE_SOURCE_DIR}/shaders/ $<TARGET_FILE_DIR:zpg>/shaders)
+        ${CMAKE_SOURCE_DIR}/shaders
+        ${PROJECT_BINARY_DIR}/shaders
+        COMMENT "Shaders copied to out dir")
 
-add_dependencies(zpg shaders/noLight.frag shaders/noLight.vert shaders/phong.frag shaders/phong.vert)
+add_dependencies(zpg copy_shaders)
+
+target_compile_options(zpg PRIVATE -fsanitize=address)
+target_link_options(zpg PRIVATE -fsanitize=address)

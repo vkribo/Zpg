@@ -140,7 +140,7 @@ void Scene::add_object(DrawableObject obj) {
 void Scene::processInput(GLFWwindow *window) {
     if (glfwGetKey(window, GLFW_KEY_ESCAPE) == GLFW_PRESS)
         glfwSetWindowShouldClose(window, true);
-    const float cameraSpeed = 0.05f; // adjust accordingly
+    const float cameraSpeed = 0.2f; // adjust accordingly
     auto cameraPos = camera.get_pos();
     auto cameraFront = camera.get_target();
     auto cameraUp = camera.get_up();

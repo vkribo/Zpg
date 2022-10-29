@@ -9,6 +9,7 @@ class Model {
     GLsizei verticesCount;
 public:
     explicit Model(std::vector<float> vertices);
+    explicit Model(const float* vertices, size_t size);
     ~Model();
     void draw() const;
 };

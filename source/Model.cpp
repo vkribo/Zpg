@@ -30,3 +30,6 @@ void Model::draw() const {
     glBindVertexArray(vao);
     glDrawArrays(GL_TRIANGLES, 0, verticesCount);
 }
+
+Model::Model(const float* vertices, size_t size) : Model(std::vector<float>(vertices, &vertices[size - 1])) {
+}
