@@ -91,10 +91,10 @@ int main()
             scene.add_object(std::move(s));
             p.set_scale(1000);
             scene.add_object(std::move(p));
-            auto g = DrawableObject(giftModel, "scene");
+            auto g = DrawableObject(giftModel, "blinn");
             g.set_position({ 1, 0.0, 0.0 });
             scene.add_object(std::move(g));
-            auto m = DrawableObject(monkeyModel, "scene");
+            auto m = DrawableObject(monkeyModel, "lambert");
             m.set_rotation({ 0.0, 45, 0.0 });
             m.set_position({-2.0, 1, 0.0});
             scene.add_object(std::move(m));
