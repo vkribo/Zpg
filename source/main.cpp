@@ -94,7 +94,7 @@ int main()
             auto g = DrawableObject(giftModel, "blinn");
             g.set_position({ 1, 0.0, 0.0 });
             scene.add_object(std::move(g));
-            auto m = DrawableObject(monkeyModel, "lambert");
+            auto m = DrawableObject(monkeyModel, "scene");
             m.set_rotation({ 0.0, 45, 0.0 });
             m.set_position({-2.0, 1, 0.0});
             scene.add_object(std::move(m));
@@ -108,7 +108,7 @@ int main()
                 scene.add_object(std::move(o));
             }
 
-            for (int i = 0; i < 2000; i++) {
+            for (int i = 0; i < 10000; i++) {
                 float x = rand() % 100 - 50;
                 float z = rand() % 100 - 50;
                 float y = 0;

@@ -47,6 +47,9 @@ target_link_libraries(zpg
         ${GLEW_LIBRARY}
         )
 
+set(CMAKE_C_FLAGS "${CMAKE_C_FLAGS} -O2")
+set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -O2")
+
 target_include_directories(zpg PRIVATE ${CMAKE_SOURCE_DIR}/headers)
 set_property(TARGET zpg PROPERTY CXX_STANDARD 23)
 
@@ -85,5 +88,5 @@ add_custom_target(copy_shaders ALL
 
 add_dependencies(zpg copy_shaders)
 
-target_compile_options(zpg PRIVATE -fsanitize=address)
-target_link_options(zpg PRIVATE -fsanitize=address)
+#target_compile_options(zpg PRIVATE -fsanitize=address)
+#target_link_options(zpg PRIVATE -fsanitize=address)
