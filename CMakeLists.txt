@@ -27,6 +27,7 @@ include_directories(
         ${GLFW_INCLUDE_PATH}
         ${GLEW_INCLUDE_PATH}
         ${GLM_INCLUDE_PATH}
+        /usr/include/assimp
 )
 
 add_compile_options(-fsanitize=address)
@@ -37,7 +38,7 @@ add_executable(zpg
         source/main.cpp
         source/Shader.cpp
         source/Model.cpp
-        source/DrawableObject.cpp source/Scene.cpp source/Transformation.cpp source/Observer.cpp source/Camera.cpp source/ShaderLoader.cpp)
+        source/DrawableObject.cpp source/Scene.cpp source/Transformation.cpp source/Observer.cpp source/Camera.cpp source/ShaderLoader.cpp source/Texture.cpp source/Skybox.cpp)
 target_link_libraries(zpg
         ${OPENGL_LIBRARY} # filled by "find_package(OpenGL REQUIRED)"
         ${GLFW_LIBRARY}
@@ -45,10 +46,11 @@ target_link_libraries(zpg
         dl
         pthread
         ${GLEW_LIBRARY}
+        assimp
         )
 
-set(CMAKE_C_FLAGS "${CMAKE_C_FLAGS} -O2")
-set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -O2")
+#set(CMAKE_C_FLAGS "${CMAKE_C_FLAGS} -O2")
+#set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -O2")
 
 target_include_directories(zpg PRIVATE ${CMAKE_SOURCE_DIR}/headers)
 set_property(TARGET zpg PROPERTY CXX_STANDARD 23)

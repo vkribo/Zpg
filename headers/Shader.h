@@ -5,6 +5,7 @@
 #include <vector>
 #include <glm/ext/matrix_float4x4.hpp>
 #include "Observer.h"
+#include "Light.h"
 
 
 enum class ShaderType {
@@ -19,8 +20,11 @@ class Shader : public Observer {
 
     static unsigned int create_shader(const std::string& source, ShaderType type);
     void create_shaders();
+    void send_float(const char* varName, float val);
     void send_matrix(const char* varName, const glm::mat4 &matrix);
     void send_vec(const char* varName, const glm::vec3 &vec);
+    void send_lights(const char *varName, const std::vector<Light> &light);
+    void send_flashlight(const Light& flashlight);
 public:
     explicit Shader(std::vector<std::pair<std::string, ShaderType>> shaders);
     unsigned int get_program_id() const;

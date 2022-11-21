@@ -13,6 +13,8 @@
 #include "Camera.h"
 #include "DrawableObject.h"
 #include "ShaderLoader.h"
+#include "Light.h"
+#include "Skybox.h"
 
 const unsigned int SCR_WIDTH = 800;
 const unsigned int SCR_HEIGHT = 600;
@@ -21,18 +23,25 @@ class Scene : public Subject {
     GLFWwindow* window;
     ShaderLoader loader;
     std::vector<std::unique_ptr<DrawableObject>> objects;
+    std::vector<Light> directional_lights;
+    std::vector<Light> point_lights;
+    std::vector<Light> spot_lights;
+    Light flashlight;
     Camera camera;
+    Skybox skybox;
     glm::mat4 projection;
     //glm::mat4 view;
     float lastX = 400, lastY = 300;
     bool firstMouse = true;
     float pitch = 0, yaw = -90;
     void load_shaders();
+    Model cube;
 public:
     explicit Scene(GLFWwindow* window);
     void set_transformations();
     void render();
     void add_object(DrawableObject obj);
+    void add_point_light(const Light& light, bool cube_representation);
     void processInput(GLFWwindow *window);
     void mouse_callback(float xpos, float ypos);
 };

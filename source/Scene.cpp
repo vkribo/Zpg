@@ -1,72 +1,7 @@
 #include "Scene.h"
 
-const char *vertexShaderSource = "#version 330 core\n"
-                                 "layout (location = 0) in vec3 aPos;\n"
-                                 "layout (location = 0) in vec3 aNormal;\n"
-                                 "uniform mat4 gModel;\n"
-                                 "uniform mat4 gProjection;\n"
-                                 "uniform mat4 gView;\n"
-                                 "out vec3 FragPos;\n"
-                                 "out vec3 Normal;\n"
-                                 "void main()\n"
-                                 "{\n"
-                                 "   gl_Position = gProjection * gView * (gModel * vec4(aPos.x, aPos.y, aPos.z, 1.0));\n"
-                                 "   FragPos = vec3(gModel * vec4(aPos, 1.0));\n"
-                                 "   Normal = aNormal;\n"
-                                 "}\0";
-const char *fragmentShaderSource = "#version 330 core\n"
-                                   "in vec3 FragPos;\n"
-                                   "in vec3 Normal;\n"
-                                   "uniform vec3 viewPos;\n"
-                                   "out vec4 FragColor;\n"
-                                   "void main()\n"
-                                   "{\n"
-                                   "   vec3 lightColor = vec3(1.0f, 1.0f, 1.0f);\n"
-                                   "   float ambientStrength = 0.2f;\n"
-                                   "   vec3 ambient = ambientStrength * lightColor;\n"
-                                   "   vec3 lightPos = vec3(0.f, 0.f, 0.f);\n"
-                                   "   vec3 norm = normalize(Normal);\n"
-                                   "   vec3 lightDir = normalize(lightPos - FragPos);\n"
-                                   "   float diff = max(dot(norm, lightDir), 0.0);\n"
-                                   "   vec3 objectColor = vec3(0.f, 0.3f, 0.5f);\n"
-                                   "   vec3 diffuse = diff * lightColor;\n"
-                                   "   float specularStrength = 0.5;\n"
-                                   "   vec3 viewDir = normalize(viewPos - FragPos);\n"
-                                   "   vec3 reflectDir = reflect(-lightDir, norm);\n"
-                                   "   float spec = pow(max(dot(viewDir, reflectDir), 0.0), 32);\n"
-                                   "   vec3 specular = (dot(norm, lightDir) < 0.0)? vec3(0.0) : specularStrength * spec * lightColor;\n"
-                                   "   vec3 result = (ambient + diffuse + specular) * objectColor;\n"
-                                   "   FragColor = vec4(result, 1.0);\n"
-                                   "}\n\0";
-
-const char *fragmentShaderSourceH1WithCheck = "#version 330 core\n"
-                                   "in vec3 FragPos;\n"
-                                   "in vec3 Normal;\n"
-                                   "uniform vec3 viewPos;\n"
-                                   "out vec4 FragColor;\n"
-                                   "void main()\n"
-                                   "{\n"
-                                   "   vec3 lightColor = vec3(1.0f, 1.0f, 1.0f);\n"
-                                   "   float ambientStrength = 0.2f;\n"
-                                   "   vec3 ambient = ambientStrength * lightColor;\n"
-                                   "   vec3 lightPos = vec3(0.f, 0.f, 0.f);\n"
-                                   "   vec3 norm = normalize(Normal);\n"
-                                   "   vec3 lightDir = normalize(lightPos - FragPos);\n"
-                                   "   float diff = max(dot(norm, lightDir), 0.0);\n"
-                                   "   vec3 objectColor = vec3(0.f, 0.3f, 0.5f);\n"
-                                   "   vec3 diffuse = diff * lightColor;\n"
-                                   "   float specularStrength = 0.5;\n"
-                                   "   vec3 viewDir = normalize(viewPos - FragPos);\n"
-                                   "   vec3 reflectDir = reflect(-lightDir, norm);\n"
-                                   "   float spec = pow(max(dot(viewDir, reflectDir), 0.0), 1);\n"
-                                   "   vec3 specular = (dot(norm, lightDir) < 0.0)? vec3(0.0) : specularStrength * spec * lightColor;\n"
-                                   "   vec3 result = (ambient + diffuse + specular) * objectColor;\n"
-                                   "   FragColor = vec4(result, 1.0);\n"
-                                   "}\n\0";
-
 Scene::Scene(GLFWwindow *window) :
         window(window),
-        //shader({ std::make_pair(vertexShaderSource, ShaderType::VERTEX), std::make_pair(fragmentShaderSource, ShaderType::FRAGMENT) }),
         projection()
 {
     //glfwSetInputMode(window, GLFW_CURSOR, GLFW_CURSOR_DISABLED);
@@ -76,6 +11,21 @@ Scene::Scene(GLFWwindow *window) :
     };
 
     glfwSetCursorPosCallback(window, func);
+    cube.load("cube.obj");
+
+    Light l;
+    l.direction = glm::vec3(-0.2f, -1.0f, -0.3f);
+    l.ambient = glm::vec3(0.2f);
+    l.specular = glm::vec3(0.5f);
+    l.diffuse = glm::vec3(0.5f);
+    directional_lights.push_back(l);
+    l.position = glm::vec3(0.0f, 2.0f, 12.0f);
+    l.ambient = l.specular = l.diffuse = glm::vec3(1.0f, 1.0f, 1.0f);
+    add_point_light(l, true);
+    flashlight = l;
+    flashlight.cutOff = glm::cos(glm::radians(12.5f));
+    flashlight.outerCutOff = glm::cos(glm::radians(17.5f));
+    //spot_lights.push_back(flashlight);
 }
 
 void Scene::set_transformations() {
@@ -89,13 +39,14 @@ void Scene::render() {
         attach(s.second.get());
         camera.attach(s.second.get());
     }
+
+    skybox = Skybox(loader.get("skybox"));
     int scr_width, scr_height;
     bool first = true;
     while (!glfwWindowShouldClose(window))
     {
         glfwGetWindowSize(window, &scr_width, &scr_height);
         projection = glm::perspective(glm::radians(45.0f), (float)scr_width / (float)scr_height, 0.1f, 100.0f);
-
         // input
         // -----
         processInput(window);
@@ -104,10 +55,24 @@ void Scene::render() {
         // ------
         glClearColor(0.2f, 0.3f, 0.3f, 1.0f);
         glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
+//        glDepthFunc(GL_LEQUAL);
+//        skybox.skybox_shader->use();
+//        set_transformations();
+//        camera.update_view();
+//        skybox.draw();
+//        skybox.skybox_shader->unuse();
+//        glDepthFunc(GL_LESS);
         for (const auto& o : objects) {
             auto s = loader.get(o->shaderName);
             s->use();
             set_transformations();
+            notify(UpdateValueInfo(EventType::SET_SHADER_DIR_LIGHTS, directional_lights));
+            notify(UpdateValueInfo(EventType::SET_SHADER_POINT_LIGHTS, point_lights));
+            notify(UpdateValueInfo(EventType::SET_SHADER_SPOT_LIGHTS, spot_lights));
+            flashlight.position = camera.get_pos();
+            flashlight.direction = camera.get_target();
+            //spot_lights[0] = flashlight;
+            //notify(UpdateValueInfo(EventType::SET_SHADER_FLASHLIGHT, flashlight));
             camera.update_view();
             o->shader = s;
             o->draw_object();
@@ -190,5 +155,16 @@ void Scene::mouse_callback(float xpos, float ypos) {
 
 void Scene::load_shaders() {
 
+}
+
+void Scene::add_point_light(const Light &light, bool cube_representation) {
+    if (cube_representation) {
+        DrawableObject cube_obj(cube, "noLight");
+        cube_obj.set_scale(0.2);
+        cube_obj.set_position(light.position);
+        add_object(std::move(cube_obj));
+    }
+
+    point_lights.push_back(light);
 }
 

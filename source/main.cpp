@@ -46,81 +46,94 @@ int main()
     }
 
     Scene scene(window);
-    int choice = 2;
-    switch (choice) {
-        case 0: {
-            Model sp(sphere, sizeof sphere / sizeof sphere[0]);
-            std::vector<DrawableObject> objs;
-            objs.emplace_back(sp, "phong");
-            objs.emplace_back(sp, "phong");
-            objs.emplace_back(sp, "phong");
-            objs.emplace_back(sp, "phong");
-            objs[0].set_position( { 3.0, 0.0, 0.0 });
-            objs[1].set_position({ -3.0, 0.0, 0.0 });
-            objs[2].set_position({ 0.0, 3.0, 0.0 });
-            objs[3].set_position({0.0, -3.0, 0.0});
-            for (auto& o : objs) {
-                scene.add_object(std::move(o));
-            }
-
-            scene.render();
-        }
-        break;
-        case 1: {
-            Model sp(sphere, sizeof sphere / sizeof sphere[0]);
-            auto a = DrawableObject(sp, "phongH1NoCheck");
-            auto b = DrawableObject(sp, "phongH1WithCheck");
-            a.set_position({-3.0, 0.0, 0.0});
-            b.set_position({3.0, 0.0, 0.0});
-            scene.add_object(std::move(a));
-            scene.add_object(std::move(b));
-            scene.render();
-        }
-        break;
-        case 2: {
-            Model sp(sphere, sizeof sphere / sizeof sphere[0]);
-            Model treeModel(tree, sizeof tree / sizeof tree[0]);
-            Model giftModel(gift, sizeof gift / sizeof gift[0]);
-            Model bushModel(plain, sizeof plain / sizeof plain[0]);
-            Model monkeyModel(suziFlat, sizeof suziFlat / sizeof suziFlat[0]);
-            Model plainModel(actual_plain::plain, sizeof actual_plain::plain / sizeof actual_plain::plain[0]);
-            auto p = DrawableObject(plainModel, "noLight");
-            auto s = DrawableObject(sp, "scene");
-            s.set_position({0.0, 3.0, -6.0});
-            s.set_scale(3.0);
-            scene.add_object(std::move(s));
-            p.set_scale(1000);
-            scene.add_object(std::move(p));
-            auto g = DrawableObject(giftModel, "blinn");
-            g.set_position({ 1, 0.0, 0.0 });
-            scene.add_object(std::move(g));
-            auto m = DrawableObject(monkeyModel, "scene");
-            m.set_rotation({ 0.0, 45, 0.0 });
-            m.set_position({-2.0, 1, 0.0});
-            scene.add_object(std::move(m));
-            srand(time(NULL));
-            for (int i = 0; i < 100; i++) {
-                float x = rand() % 100 - 50;
-                float z = rand() % 100 - 50;
-                float y = 0;
-                auto o = DrawableObject(treeModel, "scene");
-                o.set_position({ x, y, z });
-                scene.add_object(std::move(o));
-            }
-
-            for (int i = 0; i < 10000; i++) {
-                float x = rand() % 100 - 50;
-                float z = rand() % 100 - 50;
-                float y = 0;
-                auto o = DrawableObject(bushModel, "scene");
-                o.set_position({ x, y, z });
-                scene.add_object(std::move(o));
-            }
-
-            scene.render();
-        }
-        break;
-    }
+//    int choice = 2;
+//    switch (choice) {
+//        case 0: {
+//            Model sp(sphere, sizeof sphere / sizeof sphere[0]);
+//            std::vector<DrawableObject> objs;
+//            objs.emplace_back(sp, "phong");
+//            objs.emplace_back(sp, "phong");
+//            objs.emplace_back(sp, "phong");
+//            objs.emplace_back(sp, "phong");
+//            objs[0].set_position( { 3.0, 0.0, 0.0 });
+//            objs[1].set_position({ -3.0, 0.0, 0.0 });
+//            objs[2].set_position({ 0.0, 3.0, 0.0 });
+//            objs[3].set_position({0.0, -3.0, 0.0});
+//            for (auto& o : objs) {
+//                scene.add_object(std::move(o));
+//            }
+//
+//            scene.render();
+//        }
+//        break;
+//        case 1: {
+//            Model sp(sphere, sizeof sphere / sizeof sphere[0]);
+//            auto a = DrawableObject(sp, "phongH1NoCheck");
+//            auto b = DrawableObject(sp, "phongH1WithCheck");
+//            a.set_position({-3.0, 0.0, 0.0});
+//            b.set_position({3.0, 0.0, 0.0});
+//            scene.add_object(std::move(a));
+//            scene.add_object(std::move(b));
+//            scene.render();
+//        }
+//        break;
+//        case 2: {
+//            Model sp(sphere, sizeof sphere / sizeof sphere[0]);
+//            Model treeModel(tree, sizeof tree / sizeof tree[0]);
+//            Model giftModel(gift, sizeof gift / sizeof gift[0]);
+//            Model bushModel(plain, sizeof plain / sizeof plain[0]);
+//            Model monkeyModel(suziFlat, sizeof suziFlat / sizeof suziFlat[0]);
+//            Model plainModel(actual_plain::plain, sizeof actual_plain::plain / sizeof actual_plain::plain[0]);
+//            auto p = DrawableObject(plainModel, "noLight");
+//            auto s = DrawableObject(sp, "phong");
+//            s.set_position({0.0, 3.0, -6.0});
+//            s.set_scale(3.0);
+//            scene.add_object(std::move(s));
+//            p.set_scale(1000);
+//            scene.add_object(std::move(p));
+//            auto g = DrawableObject(giftModel, "phong");
+//            g.set_position({ 1, 0.0, 0.0 });
+//            scene.add_object(std::move(g));
+//            auto m = DrawableObject(monkeyModel, "phong");
+//            m.set_rotation({ 0.0, 45, 0.0 });
+//            m.set_position({-2.0, 1, 0.0});
+//            scene.add_object(std::move(m));
+//            srand(time(NULL));
+//            for (int i = 0; i < 100; i++) {
+//                float x = rand() % 100 - 50;
+//                float z = rand() % 100 - 50;
+//                float y = 0;
+//                auto o = DrawableObject(treeModel, "phong");
+//                o.set_position({ x, y, z });
+//                scene.add_object(std::move(o));
+//            }
+//
+//            for (int i = 0; i < 100; i++) {
+//                float x = rand() % 100 - 50;
+//                float z = rand() % 100 - 50;
+//                float y = 0;
+//                auto o = DrawableObject(bushModel, "phong");
+//                o.set_position({ x, y, z });
+//                scene.add_object(std::move(o));
+//            }
+//
+//            scene.render();
+//        }
+//        break;
+//    }
+    Model house;
+    house.load("model.obj");
+    DrawableObject house_object(house, "phong");
+    Texture t;
+    t.load("grass.png");
+    house_object.set_texture(t);
+    scene.add_object(std::move(house_object));
+    t.load("test.png");
+    DrawableObject second_house(house, "phong");
+    second_house.set_texture(t);
+    second_house.set_position(glm::vec3(20, 0.0, 0.0));
+    scene.add_object(std::move(second_house));
+    scene.render();
 
     glfwTerminate();
     return 0;

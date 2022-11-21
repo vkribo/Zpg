@@ -15,6 +15,8 @@ void DrawableObject::draw_object() {
 
     //shader->use();
     shader->update(UpdateValueInfo<glm::mat4>(EventType::SET_SHADER_MODEL, modelMatrix->get()));
+    texture.bind();
+    shader->update(UpdateValueInfo<unsigned int>(EventType::SET_SHADER_TEXTURE_UNIT, texture.get_texture_id()));
     model.draw();
 }
 
@@ -31,4 +33,8 @@ void DrawableObject::set_scale(float scale) {
 void DrawableObject::set_rotation(glm::vec3 rotation) {
     this->rotation = rotation;
     notify(UpdateValueInfo<glm::vec3>(EventType::OBJ_ROTATION_CHANGED, rotation));
+}
+
+void DrawableObject::set_texture(Texture tex) {
+    texture = tex;
 }
