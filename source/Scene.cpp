@@ -11,7 +11,7 @@ Scene::Scene(GLFWwindow *window) :
     };
 
     glfwSetCursorPosCallback(window, func);
-    cube.load("cube.obj");
+    cube.load("assets/cube.obj");
 
     Light l;
     l.direction = glm::vec3(-0.2f, -1.0f, -0.3f);

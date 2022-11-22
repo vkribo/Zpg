@@ -88,7 +88,13 @@ add_custom_target(copy_shaders ALL
         ${PROJECT_BINARY_DIR}/shaders
         COMMENT "Shaders copied to out dir")
 
-add_dependencies(zpg copy_shaders)
+add_custom_target(copy_assets ALL
+        COMMAND ${CMAKE_COMMAND} -E copy_directory
+        ${CMAKE_SOURCE_DIR}/assets
+        ${PROJECT_BINARY_DIR}/assets
+        COMMENT "Assets copied to out dir")
+
+add_dependencies(zpg copy_shaders copy_assets)
 
 #target_compile_options(zpg PRIVATE -fsanitize=address)
 #target_link_options(zpg PRIVATE -fsanitize=address)

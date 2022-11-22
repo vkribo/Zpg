@@ -43,12 +43,12 @@ float skyboxVertices[] = {
 Skybox::Skybox(Shader *skybox_shader) : cube(skyboxVertices, sizeof(skyboxVertices) / sizeof(skyboxVertices[0])) {
     this->skybox_shader = skybox_shader;
     texture.load_cubemap({
-         "skybox/right.jpg",
-         "skybox/left.jpg",
-         "skybox/top.jpg",
-         "skybox/bottom.jpg",
-         "skybox/front.jpg",
-         "skybox/back.jpg"
+         "assets/skybox/right.jpg",
+         "assets/skybox/left.jpg",
+         "assets/skybox/top.jpg",
+         "assets/skybox/bottom.jpg",
+         "assets/skybox/front.jpg",
+         "assets/skybox/back.jpg"
     });
 }
 
