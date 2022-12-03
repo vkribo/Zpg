@@ -8,7 +8,7 @@ DrawableObject::DrawableObject(const Model &model, std::string shaderName) : mod
     modelMatrix->children.push_back(std::make_unique<Scale>());
 }
 
-void DrawableObject::draw_object() {
+void DrawableObject::draw_object(Shader *shader) {
     if (shader == nullptr) {
         return;
     }

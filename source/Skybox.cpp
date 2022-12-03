@@ -69,9 +69,12 @@ Skybox::Skybox(Shader *skybox_shader) {
 }
 
 void Skybox::draw() {
-    //skybox_shader->use();
     texture.bind();
     skybox_shader->update(UpdateValueInfo<unsigned int>(EventType::SET_SHADER_TEXTURE_UNIT, texture.get_texture_id()));
+    skybox_shader->use();
+    glDepthFunc(GL_LEQUAL);
     glBindVertexArray(VAO);
     glDrawArrays(GL_TRIANGLES, 0, (sizeof skyboxVertices / sizeof skyboxVertices[0]) / 3);
+    glDepthFunc(GL_LESS);
+    skybox_shader->unuse();
 }

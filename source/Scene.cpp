@@ -42,7 +42,6 @@ void Scene::render() {
 
     skybox = Skybox(loader.get("skybox"));
     int scr_width, scr_height;
-    bool first = true;
     while (!glfwWindowShouldClose(window))
     {
         int newWidth, newHeight;
@@ -62,29 +61,14 @@ void Scene::render() {
         // ------
         glClearColor(0.2f, 0.3f, 0.3f, 1.0f);
         glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
-        glDepthFunc(GL_LEQUAL);
-        skybox.skybox_shader->use();
-        //camera.update_view();
         skybox.draw();
-        skybox.skybox_shader->unuse();
-        glDepthFunc(GL_LESS);
+        flashlight.position = camera.get_pos();
+        flashlight.direction = camera.get_target();
         for (const auto& o : objects) {
             auto s = loader.get(o->shaderName);
-            //s->use();
-            flashlight.position = camera.get_pos();
-            flashlight.direction = camera.get_target();
-            //spot_lights[0] = flashlight;
             //notify(UpdateValueInfo(EventType::SET_SHADER_FLASHLIGHT, flashlight));
-            //camera.update_view();
-            o->shader = s;
-            o->draw_object();
-            //s->unuse();
+            o->draw_object(s);
         }
-
-        //for (const auto& s : loader.shaders_ref()) {
-          //  detach(s.second.get());
-            //camera.detach(s.second.get());
-        //}
 
         // glfw: swap buffers and poll IO events (keys pressed/released, mouse moved etc.)
         // -------------------------------------------------------------------------------

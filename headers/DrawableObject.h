@@ -13,10 +13,9 @@ class DrawableObject : public Subject {
     glm::vec3 rotation;
     Texture texture;
 public:
-    Shader* shader = nullptr;
     std::string shaderName;
     explicit DrawableObject(const Model &model, std::string shaderName);
-    void draw_object();
+    void draw_object(Shader *shader);
     void set_position(glm::vec3 pos);
     void set_scale(float scale);
     void set_rotation(glm::vec3 rotation);
