@@ -9,8 +9,8 @@ class Camera : public Subject {
     glm::vec3 pos = glm::vec3(0.0f,1.0f, 5.0f);
     glm::vec3 target = glm::vec3(0.0f, 0.0f, -1.0f);
     glm::vec3 up = glm::vec3(0.0f, 1.0f, 0.0f);
-public:
     void update_view();
+public:
     void set_pos(glm::vec3 p);
     void set_target(glm::vec3 t);
     void set_up(glm::vec3 u);

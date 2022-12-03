@@ -28,10 +28,6 @@ Scene::Scene(GLFWwindow *window) :
     //spot_lights.push_back(flashlight);
 }
 
-void Scene::set_transformations() {
-    notify(UpdateValueInfo(EventType::SET_SHADER_PROJECTION, projection));
-}
-
 void Scene::render() {
     glEnable(GL_DEPTH_TEST);
     loader.load();
@@ -40,13 +36,24 @@ void Scene::render() {
         camera.attach(s.second.get());
     }
 
+    notify(UpdateValueInfo(EventType::SET_SHADER_DIR_LIGHTS, directional_lights));
+    notify(UpdateValueInfo(EventType::SET_SHADER_POINT_LIGHTS, point_lights));
+    notify(UpdateValueInfo(EventType::SET_SHADER_SPOT_LIGHTS, spot_lights));
+
     skybox = Skybox(loader.get("skybox"));
     int scr_width, scr_height;
     bool first = true;
     while (!glfwWindowShouldClose(window))
     {
-        glfwGetWindowSize(window, &scr_width, &scr_height);
-        projection = glm::perspective(glm::radians(45.0f), (float)scr_width / (float)scr_height, 0.1f, 100.0f);
+        int newWidth, newHeight;
+        glfwGetWindowSize(window, &newWidth, &newHeight);
+        if (scr_width != newWidth || newHeight != scr_height) {
+            scr_width = newWidth;
+            scr_height = newHeight;
+            projection = glm::perspective(glm::radians(45.0f), (float)scr_width / (float)scr_height, 0.1f, 100.0f);
+            notify(UpdateValueInfo(EventType::SET_SHADER_PROJECTION, projection));
+        }
+
         // input
         // -----
         processInput(window);
@@ -57,31 +64,21 @@ void Scene::render() {
         glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
         glDepthFunc(GL_LEQUAL);
         skybox.skybox_shader->use();
-        set_transformations();
-        camera.update_view();
+        //camera.update_view();
         skybox.draw();
         skybox.skybox_shader->unuse();
         glDepthFunc(GL_LESS);
         for (const auto& o : objects) {
             auto s = loader.get(o->shaderName);
-            s->use();
-            set_transformations();
-            notify(UpdateValueInfo(EventType::SET_SHADER_DIR_LIGHTS, directional_lights));
-            notify(UpdateValueInfo(EventType::SET_SHADER_POINT_LIGHTS, point_lights));
-            notify(UpdateValueInfo(EventType::SET_SHADER_SPOT_LIGHTS, spot_lights));
+            //s->use();
             flashlight.position = camera.get_pos();
             flashlight.direction = camera.get_target();
             //spot_lights[0] = flashlight;
             //notify(UpdateValueInfo(EventType::SET_SHADER_FLASHLIGHT, flashlight));
-            camera.update_view();
+            //camera.update_view();
             o->shader = s;
             o->draw_object();
-            s->unuse();
-        }
-
-        if (first) {
-            camera.update_view();
-            first = false;
+            //s->unuse();
         }
 
         //for (const auto& s : loader.shaders_ref()) {

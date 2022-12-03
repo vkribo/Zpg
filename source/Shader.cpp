@@ -42,8 +42,29 @@ Shader::~Shader() {
 }
 
 void Shader::use() {
+    if (inUse) {
+        return;
+    }
+
     inUse = true;
     glUseProgram(shaderProgram);
+    if (model)
+        send_matrix("gModel", *model);
+    if (projection)
+        send_matrix("gProjection", *projection);
+    if (view)
+        send_matrix("gView", *view);
+    if (viewPos)
+        send_vec("viewPos", *viewPos);
+    if (dir_lights)
+        send_lights("dir_lights", *dir_lights);
+    if (point_lights)
+        send_lights("point_lights", *point_lights);
+    if (spot_lights)
+        send_lights("spot_lights", *spot_lights);
+    if (flashlight)
+        send_flashlight(*flashlight);
+    glUniform1ui(glGetUniformLocation(shaderProgram, "textureUnitID"), textureUnit);
 }
 
 unsigned int Shader::create_shader(const std::string &source, ShaderType type) {
@@ -77,36 +98,32 @@ unsigned int Shader::create_shader(const std::string &source, ShaderType type) {
 }
 
 void Shader::update(const UpdateInfo &info) {
-    if (!inUse) {
-        return;
-    }
-
     switch (info.type) {
         case EventType::SET_SHADER_MODEL:
-            send_matrix("gModel", dynamic_cast<const UpdateValueInfo<glm::mat4>&>(info).value);
+            model = &dynamic_cast<const UpdateValueInfo<glm::mat4>&>(info).value;
         break;
         case EventType::SET_SHADER_PROJECTION:
-            send_matrix("gProjection", dynamic_cast<const UpdateValueInfo<glm::mat4>&>(info).value);
+            projection = &dynamic_cast<const UpdateValueInfo<glm::mat4>&>(info).value;
         break;
         case EventType::SET_SHADER_VIEW:
-            send_matrix("gView", dynamic_cast<const UpdateValueInfo<glm::mat4>&>(info).value);
+            view = &dynamic_cast<const UpdateValueInfo<glm::mat4>&>(info).value;
         break;
         case EventType::SET_SHADER_VIEWPOS:
-            send_vec("viewPos", dynamic_cast<const UpdateValueInfo<glm::vec3>&>(info).value);
+            viewPos = &dynamic_cast<const UpdateValueInfo<glm::vec3>&>(info).value;
         break;
         case EventType::SET_SHADER_DIR_LIGHTS:
-            send_lights("dir_lights", info.get_val<std::vector<Light>>());
+            dir_lights = &info.get_val<std::vector<Light>>();
         case EventType::SET_SHADER_POINT_LIGHTS:
-            send_lights("point_lights", info.get_val<std::vector<Light>>());
+            point_lights = &info.get_val<std::vector<Light>>();
             break;
         case EventType::SET_SHADER_SPOT_LIGHTS:
-            send_lights("spot_lights", info.get_val<std::vector<Light>>());
+            spot_lights = &info.get_val<std::vector<Light>>();
             break;
         case EventType::SET_SHADER_FLASHLIGHT:
-            send_flashlight(info.get_val<Light>());
+            flashlight = &info.get_val<Light>();
             break;
         case EventType::SET_SHADER_TEXTURE_UNIT:
-            glUniform1ui(glGetUniformLocation(shaderProgram, "textureUnitID"), info.get_val<unsigned int>());
+            textureUnit = info.get_val<unsigned int>();
             break;
         default:
             return;

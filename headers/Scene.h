@@ -38,7 +38,7 @@ class Scene : public Subject {
     Model cube;
 public:
     explicit Scene(GLFWwindow* window);
-    void set_transformations();
+    //void set_transformations();
     void render();
     void add_object(DrawableObject obj);
     void add_point_light(const Light& light, bool cube_representation);
