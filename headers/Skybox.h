@@ -5,8 +5,9 @@
 #include "Shader.h"
 
 class Skybox {
-    Model cube;
     Texture texture;
+    GLuint VBO;
+    GLuint VAO;
 public:
     Shader* skybox_shader;
     Skybox() = default;

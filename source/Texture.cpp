@@ -39,10 +39,10 @@ unsigned int Texture::get_texture_id() const {
 void Texture::load_cubemap(const std::vector<std::string> &file_paths) {
     glGenTextures(1, &texture);
     glBindTexture(GL_TEXTURE_CUBE_MAP, texture);
-
     int width, height, nrChannels;
     for (unsigned int i = 0; i < file_paths.size(); i++)
     {
+        stbi_set_flip_vertically_on_load(0);
         unsigned char *data = stbi_load(file_paths[i].c_str(), &width, &height, &nrChannels, 0);
         if (data)
         {

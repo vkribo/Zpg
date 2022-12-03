@@ -55,13 +55,13 @@ void Scene::render() {
         // ------
         glClearColor(0.2f, 0.3f, 0.3f, 1.0f);
         glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
-//        glDepthFunc(GL_LEQUAL);
-//        skybox.skybox_shader->use();
-//        set_transformations();
-//        camera.update_view();
-//        skybox.draw();
-//        skybox.skybox_shader->unuse();
-//        glDepthFunc(GL_LESS);
+        glDepthFunc(GL_LEQUAL);
+        skybox.skybox_shader->use();
+        set_transformations();
+        camera.update_view();
+        skybox.draw();
+        skybox.skybox_shader->unuse();
+        glDepthFunc(GL_LESS);
         for (const auto& o : objects) {
             auto s = loader.get(o->shaderName);
             s->use();
