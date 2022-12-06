@@ -46,102 +46,84 @@ int main()
     }
 
     Scene scene(window);
-//    int choice = 2;
-//    switch (choice) {
-//        case 0: {
-//            Model sp(sphere, sizeof sphere / sizeof sphere[0]);
-//            std::vector<DrawableObject> objs;
-//            objs.emplace_back(sp, "phong");
-//            objs.emplace_back(sp, "phong");
-//            objs.emplace_back(sp, "phong");
-//            objs.emplace_back(sp, "phong");
-//            objs[0].set_position( { 3.0, 0.0, 0.0 });
-//            objs[1].set_position({ -3.0, 0.0, 0.0 });
-//            objs[2].set_position({ 0.0, 3.0, 0.0 });
-//            objs[3].set_position({0.0, -3.0, 0.0});
-//            for (auto& o : objs) {
-//                scene.add_object(std::move(o));
-//            }
-//
-//            scene.render();
-//        }
-//        break;
-//        case 1: {
-//            Model sp(sphere, sizeof sphere / sizeof sphere[0]);
-//            auto a = DrawableObject(sp, "phongH1NoCheck");
-//            auto b = DrawableObject(sp, "phongH1WithCheck");
-//            a.set_position({-3.0, 0.0, 0.0});
-//            b.set_position({3.0, 0.0, 0.0});
-//            scene.add_object(std::move(a));
-//            scene.add_object(std::move(b));
-//            scene.render();
-//        }
-//        break;
-//        case 2: {
-//            Model sp(sphere, sizeof sphere / sizeof sphere[0]);
-//            Model treeModel(tree, sizeof tree / sizeof tree[0]);
-//            Model giftModel(gift, sizeof gift / sizeof gift[0]);
-//            Model bushModel(plain, sizeof plain / sizeof plain[0]);
-//            Model monkeyModel(suziFlat, sizeof suziFlat / sizeof suziFlat[0]);
-//            Model plainModel(actual_plain::plain, sizeof actual_plain::plain / sizeof actual_plain::plain[0]);
-//            auto p = DrawableObject(plainModel, "noLight");
-//            auto s = DrawableObject(sp, "phong");
-//            s.set_position({0.0, 3.0, -6.0});
-//            s.set_scale(3.0);
-//            scene.add_object(std::move(s));
-//            p.set_scale(1000);
-//            scene.add_object(std::move(p));
-//            auto g = DrawableObject(giftModel, "phong");
-//            g.set_position({ 1, 0.0, 0.0 });
-//            scene.add_object(std::move(g));
-//            auto m = DrawableObject(monkeyModel, "phong");
-//            m.set_rotation({ 0.0, 45, 0.0 });
-//            m.set_position({-2.0, 1, 0.0});
-//            scene.add_object(std::move(m));
-//            srand(time(NULL));
-//            for (int i = 0; i < 100; i++) {
-//                float x = rand() % 100 - 50;
-//                float z = rand() % 100 - 50;
-//                float y = 0;
-//                auto o = DrawableObject(treeModel, "phong");
-//                o.set_position({ x, y, z });
-//                scene.add_object(std::move(o));
-//            }
-//
-//            for (int i = 0; i < 100; i++) {
-//                float x = rand() % 100 - 50;
-//                float z = rand() % 100 - 50;
-//                float y = 0;
-//                auto o = DrawableObject(bushModel, "phong");
-//                o.set_position({ x, y, z });
-//                scene.add_object(std::move(o));
-//            }
-//
-//            scene.render();
-//        }
-//        break;
-//    }
-    Model house;
-    house.load("assets/model.obj");
-    DrawableObject house_object(house, "phong");
-    Texture t;
-    t.load("assets/grass.png");
-    house_object.set_texture(t);
-    //house_object.add_animation(std::make_unique<RepeatedLineMovement>(glm::vec3(1,1,1), 10));
-    auto& house_ref = scene.add_object(std::move(house_object));
-    t.load("assets/test.png");
-    DrawableObject second_house(house, "phong");
-    second_house.set_texture(t);
-    second_house.set_position(glm::vec3(20, 0.0, 0.0));
-    auto& second_house_ref = scene.add_object(std::move(second_house));
-    second_house_ref.add_animation(std::make_unique<RotateAroundObject>(house_ref, 10));
-    Model terrain;
-    terrain.load("assets/terrain/teren.obj");
-    t.load("assets/grass.png");
-    DrawableObject terrainObj(terrain, "phong");
-    terrainObj.set_texture(t);
-    scene.add_object(std::move(terrainObj));
-    scene.render();
+    int choice = 2;
+    switch (choice) {
+        case 0: {
+            Model sp(sphere, sizeof sphere / sizeof sphere[0]);
+            std::vector<DrawableObject> objs;
+            objs.emplace_back(sp, "phong");
+            objs.emplace_back(sp, "phong");
+            objs.emplace_back(sp, "phong");
+            objs.emplace_back(sp, "phong");
+            objs[0].set_position( { 3.0, 0.0, 0.0 });
+            objs[1].set_position({ -3.0, 0.0, 0.0 });
+            objs[2].set_position({ 0.0, 3.0, 0.0 });
+            objs[3].set_position({0.0, -3.0, 0.0});
+            for (auto& o : objs) {
+                scene.add_object(std::move(o));
+            }
+
+            Light l;
+            l.position = glm::vec3(0.0f, 0.0, 0.0f);
+            l.ambient = l.specular = l.diffuse = glm::vec3(1.0);
+            scene.add_point_light(l, true);
+
+            scene.render();
+        }
+        break;
+        case 1: {
+            Model sp(sphere, sizeof sphere / sizeof sphere[0]);
+            auto a = DrawableObject(sp, "phongH1NoCheck");
+            auto b = DrawableObject(sp, "phongH1WithCheck");
+            a.set_position({-3.0, 0.0, 0.0});
+            b.set_position({3.0, 0.0, 0.0});
+            scene.add_object(std::move(a));
+            scene.add_object(std::move(b));
+            scene.render();
+        }
+        break;
+        case 2: {
+            Model house;
+            house.load("assets/model.obj");
+            DrawableObject house_object(house, "phong");
+            Texture t;
+            t.load("assets/test.png");
+            house_object.set_texture(t);
+            //house_object.add_animation(std::make_unique<RepeatedLineMovement>(glm::vec3(1,1,1), 10));
+            auto& house_ref = scene.add_object(std::move(house_object));
+            t.load("assets/test.png");
+            Model tree;
+            tree.load("assets/tree/tree.obj");
+            DrawableObject tree_obj(tree, "phong");
+            t.load("assets/tree/tree.png");
+            tree_obj.set_texture(t);
+            tree_obj.set_position(glm::vec3(20, 0.0, 0.0));
+            tree_obj.set_scale(0.2);
+            auto& treeRef = scene.add_object(std::move(tree_obj));
+            Model zombie;
+            zombie.load("assets/zombie/zombie.obj");
+            t.load("assets/zombie/zombie.png");
+            DrawableObject zobmie_obj(zombie, "phong");
+            zobmie_obj.set_texture(t);
+            auto& zombie_ref = scene.add_object(std::move(zobmie_obj));
+            zombie_ref.set_position(glm::vec3(10, 0.0, 0.0));
+            zombie_ref.add_animation(std::make_unique<RotateAroundObject>(treeRef));
+            DrawableObject zombie_obj2(zombie, "phong");
+            zombie_obj2.set_texture(t);
+            auto& zombie2Ref = scene.add_object(std::move(zombie_obj2));
+            zombie2Ref.set_position(glm::vec3(8, 0.0, 0.0));
+            zombie2Ref.add_animation(std::make_unique<RepeatedLineMovement>(glm::vec3(0, 0, 1), 10));
+            Model terrain;
+            terrain.load("assets/terrain/teren.obj");
+            t.load("assets/grass.png");
+            DrawableObject terrainObj(terrain, "phong");
+            terrainObj.set_texture(t);
+            scene.add_object(std::move(terrainObj));
+            scene.render();
+        }
+        break;
+    }
+
 
     glfwTerminate();
     return 0;

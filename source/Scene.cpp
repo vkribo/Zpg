@@ -93,8 +93,6 @@ void Scene::render() {
             o->draw_object(s);
         }
 
-        glStencilFunc(GL_ALWAYS, -1, 0xFF);
-
         // glfw: swap buffers and poll IO events (keys pressed/released, mouse moved etc.)
         // -------------------------------------------------------------------------------
         glfwSwapBuffers(window);
@@ -234,4 +232,3 @@ void Scene::delete_obj() {
         objects.erase(objects.begin() + i);
     }
 }
-

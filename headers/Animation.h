@@ -34,6 +34,6 @@ class RotateAroundObject : public Animation {
 protected:
     void init(DrawableObject &object) override;
 public:
-    RotateAroundObject(DrawableObject& other, float radius);
+    explicit RotateAroundObject(DrawableObject& other);
     void step(DrawableObject& object) override;
 };

@@ -3,7 +3,7 @@
 RepeatedLineMovement::RepeatedLineMovement(glm::vec3 lineVector, float reverseDistance)
     : lineVector(glm::normalize(lineVector)), reverseDistance(reverseDistance)
 {
-    stepDistance = 0.2;
+    stepDistance = 0.1;
 }
 
 void RepeatedLineMovement::step(DrawableObject &object) {
@@ -19,8 +19,8 @@ void RepeatedLineMovement::step(DrawableObject &object) {
 }
 
 
-RotateAroundObject::RotateAroundObject(DrawableObject& other, float radius)
-    : other(other), radius(radius)
+RotateAroundObject::RotateAroundObject(DrawableObject& other)
+    : other(other)
 {
     float angle = 1 * (M_PI / 180);
     rotationMatrix[0][0] = cosf(angle);
