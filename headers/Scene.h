@@ -34,11 +34,18 @@ class Scene : public Subject {
     float lastX = 400, lastY = 300;
     bool firstMouse = true;
     float pitch = 0, yaw = -90;
+    int scr_width, scr_height;
     void load_shaders();
     Model cube;
+    Model tree;
+    Texture treeTex;
+
+    std::pair<unsigned int, glm::vec3> get_clicked_obj();
+    void mouse_clicked(int button, int action, int mods);
+    void plant_tree();
 public:
     explicit Scene(GLFWwindow* window);
-    void set_transformations();
+    //void set_transformations();
     void render();
     void add_object(DrawableObject obj);
     void add_point_light(const Light& light, bool cube_representation);

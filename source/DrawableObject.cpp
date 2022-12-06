@@ -8,16 +8,19 @@ DrawableObject::DrawableObject(const Model &model, std::string shaderName) : mod
     modelMatrix->children.push_back(std::make_unique<Scale>());
 }
 
-void DrawableObject::draw_object() {
+void DrawableObject::draw_object(Shader *shader) {
     if (shader == nullptr) {
         return;
     }
 
     //shader->use();
-    shader->update(UpdateValueInfo<glm::mat4>(EventType::SET_SHADER_MODEL, modelMatrix->get()));
+    auto currentModelMat = modelMatrix->get();
+    shader->update(UpdateValueInfo<glm::mat4>(EventType::SET_SHADER_MODEL, currentModelMat));
     texture.bind();
     shader->update(UpdateValueInfo<unsigned int>(EventType::SET_SHADER_TEXTURE_UNIT, texture.get_texture_id()));
+    shader->use();
     model.draw();
+    shader->unuse();
 }
 
 void DrawableObject::set_position(glm::vec3 pos) {

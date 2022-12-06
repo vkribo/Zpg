@@ -18,6 +18,17 @@ class Shader : public Observer {
     unsigned int shaderProgram = -1;
     bool inUse = false;
 
+    const glm::mat4* model = nullptr;
+    const glm::mat4* projection = nullptr;
+    const glm::mat4* view = nullptr;
+    const glm::vec3* viewPos = nullptr;
+    const std::vector<Light>* dir_lights = nullptr;
+    const std::vector<Light>* point_lights = nullptr;
+    const std::vector<Light>* spot_lights = nullptr;
+    const Light* flashlight = nullptr;
+    unsigned int textureUnit;
+
+
     static unsigned int create_shader(const std::string& source, ShaderType type);
     void create_shaders();
     void send_float(const char* varName, float val);
