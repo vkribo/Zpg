@@ -17,4 +17,5 @@ public:
     [[nodiscard]] glm::vec3 get_pos() const;
     [[nodiscard]] glm::vec3 get_target() const;
     [[nodiscard]] glm::vec3 get_up() const;
+    glm::mat4& get_view();
 };

@@ -33,3 +33,7 @@ void Camera::update_view() {
     notify(UpdateValueInfo<glm::mat4>(EventType::SET_SHADER_VIEW, view));
     notify(UpdateValueInfo<glm::vec3>(EventType::SET_SHADER_VIEWPOS, pos));
 }
+
+glm::mat4 &Camera::get_view() {
+    return view;
+}

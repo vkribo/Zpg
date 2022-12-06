@@ -133,6 +133,12 @@ int main()
     second_house.set_texture(t);
     second_house.set_position(glm::vec3(20, 0.0, 0.0));
     scene.add_object(std::move(second_house));
+    Model terrain;
+    terrain.load("assets/terrain/teren.obj");
+    t.load("assets/grass.png");
+    DrawableObject terrainObj(terrain, "phong");
+    terrainObj.set_texture(t);
+    scene.add_object(std::move(terrainObj));
     scene.render();
 
     glfwTerminate();

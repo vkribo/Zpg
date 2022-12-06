@@ -1,5 +1,7 @@
 #include "Scene.h"
 
+#include <glm/ext/matrix_projection.hpp>
+
 Scene::Scene(GLFWwindow *window) :
         window(window),
         projection()
@@ -10,8 +12,16 @@ Scene::Scene(GLFWwindow *window) :
         static_cast<Scene *>(glfwGetWindowUserPointer(window))->mouse_callback(xpos, ypos);
     };
 
+    auto userMouseClick = [](GLFWwindow* window, int button, int action, int mods) {
+        static_cast<Scene *>(glfwGetWindowUserPointer(window))->mouse_clicked(button, action, mods);
+    };
+
+    glfwSetMouseButtonCallback(window, userMouseClick);
     glfwSetCursorPosCallback(window, func);
     cube.load("assets/cube.obj");
+
+    tree.load("assets/tree/tree.obj");
+    treeTex.load("assets/tree/tree.png");
 
     Light l;
     l.direction = glm::vec3(-0.2f, -1.0f, -0.3f);
@@ -30,6 +40,7 @@ Scene::Scene(GLFWwindow *window) :
 
 void Scene::render() {
     glEnable(GL_DEPTH_TEST);
+    glEnable(GL_STENCIL_TEST);
     loader.load();
     for (const auto& s : loader.shaders_ref()) {
         attach(s.second.get());
@@ -41,7 +52,6 @@ void Scene::render() {
     notify(UpdateValueInfo(EventType::SET_SHADER_SPOT_LIGHTS, spot_lights));
 
     skybox = Skybox(loader.get("skybox"));
-    int scr_width, scr_height;
     while (!glfwWindowShouldClose(window))
     {
         int newWidth, newHeight;
@@ -49,7 +59,7 @@ void Scene::render() {
         if (scr_width != newWidth || newHeight != scr_height) {
             scr_width = newWidth;
             scr_height = newHeight;
-            projection = glm::perspective(glm::radians(45.0f), (float)scr_width / (float)scr_height, 0.1f, 100.0f);
+            projection = glm::perspective(glm::radians(45.0f), (float)scr_width / (float)scr_height, 0.1f, 1000.0f);
             notify(UpdateValueInfo(EventType::SET_SHADER_PROJECTION, projection));
         }
 
@@ -64,9 +74,11 @@ void Scene::render() {
         skybox.draw();
         flashlight.position = camera.get_pos();
         flashlight.direction = camera.get_target();
-        for (const auto& o : objects) {
+        for (int i = 0; i < objects.size(); i++) {
+            const auto& o = objects[i];
             auto s = loader.get(o->shaderName);
-            //notify(UpdateValueInfo(EventType::SET_SHADER_FLASHLIGHT, flashlight));
+            notify(UpdateValueInfo(EventType::SET_SHADER_FLASHLIGHT, flashlight));
+            glStencilFunc(GL_ALWAYS, i + 1, 0xFF);
             o->draw_object(s);
         }
 
@@ -147,5 +159,47 @@ void Scene::add_point_light(const Light &light, bool cube_representation) {
     }
 
     point_lights.push_back(light);
+}
+
+std::pair<unsigned int, glm::vec3> Scene::get_clicked_obj() {
+    GLbyte color[4];
+    GLfloat depth;
+    GLuint index;
+
+    GLint x = lastX;
+    GLint y = lastY;
+
+    int newy = scr_height - y;
+    glReadPixels(x, newy, 1, 1, GL_RGBA, GL_UNSIGNED_BYTE, color);
+    glReadPixels(x, newy, 1, 1, GL_DEPTH_COMPONENT, GL_FLOAT, &depth);
+    glReadPixels(x, newy, 1, 1, GL_STENCIL_INDEX, GL_UNSIGNED_INT, &index);
+
+    glm::vec3 screenX = glm::vec3(x, newy, depth);
+    glm::mat4 view = camera.get_view();
+    glm::mat4 projection = this->projection;
+    glm::vec4 viewPort = glm::vec4(0, 0, scr_width, scr_height);
+    glm::vec3 pos = glm::unProject(screenX, view, projection, viewPort);
+    printf("unProject [%f,%f,%f]\n", pos.x, pos.y, pos.z);
+    return std::make_pair(index, pos);
+}
+
+void Scene::mouse_clicked(int button, int action, int mods) {
+    if (action != 1) {
+        return;
+    }
+
+    if (button == 0) {
+        plant_tree();
+        return;
+    }
+}
+
+void Scene::plant_tree() {
+    auto coords = get_clicked_obj().second;
+    auto obj = DrawableObject(tree, "phong");
+    obj.set_texture(treeTex);
+    obj.set_scale(0.3);
+    obj.set_position(coords);
+    add_object(std::move(obj));
 }
 
