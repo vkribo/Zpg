@@ -48,7 +48,7 @@ public:
     explicit Scene(GLFWwindow* window);
     //void set_transformations();
     void render();
-    void add_object(DrawableObject obj);
+    DrawableObject & add_object(DrawableObject obj);
     void add_point_light(const Light& light, bool cube_representation);
     void processInput(GLFWwindow *window);
     void mouse_callback(float xpos, float ypos);

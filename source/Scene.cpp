@@ -102,10 +102,12 @@ void Scene::render() {
     }
 }
 
-void Scene::add_object(DrawableObject obj) {
+DrawableObject & Scene::add_object(DrawableObject obj) {
     auto u = std::make_unique<DrawableObject>(std::move(obj));
+    auto& res = *u;
     objects.push_back(std::move(u));
     //notify(UpdateValueInfo<Shader*>(EventType::SET_SHADER, &shader));
+    return res;
 }
 
 void Scene::processInput(GLFWwindow *window) {

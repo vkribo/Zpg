@@ -127,13 +127,14 @@ int main()
     Texture t;
     t.load("assets/grass.png");
     house_object.set_texture(t);
-    scene.add_object(std::move(house_object));
+    //house_object.add_animation(std::make_unique<RepeatedLineMovement>(glm::vec3(1,1,1), 10));
+    auto& house_ref = scene.add_object(std::move(house_object));
     t.load("assets/test.png");
     DrawableObject second_house(house, "phong");
     second_house.set_texture(t);
     second_house.set_position(glm::vec3(20, 0.0, 0.0));
-    second_house.add_animation(std::make_unique<RepeatedLineMovement>(glm::vec3(1,1,1), 10));
-    scene.add_object(std::move(second_house));
+    auto& second_house_ref = scene.add_object(std::move(second_house));
+    second_house_ref.add_animation(std::make_unique<RotateAroundObject>(house_ref, 10));
     Model terrain;
     terrain.load("assets/terrain/teren.obj");
     t.load("assets/grass.png");
