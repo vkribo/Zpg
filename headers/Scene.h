@@ -43,6 +43,7 @@ class Scene : public Subject {
     std::pair<unsigned int, glm::vec3> get_clicked_obj();
     void mouse_clicked(int button, int action, int mods);
     void plant_tree();
+    void delete_obj();
 public:
     explicit Scene(GLFWwindow* window);
     //void set_transformations();

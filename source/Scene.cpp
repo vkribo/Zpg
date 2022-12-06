@@ -41,6 +41,7 @@ Scene::Scene(GLFWwindow *window) :
 void Scene::render() {
     glEnable(GL_DEPTH_TEST);
     glEnable(GL_STENCIL_TEST);
+    glStencilOp(GL_KEEP, GL_KEEP, GL_REPLACE);
     loader.load();
     for (const auto& s : loader.shaders_ref()) {
         attach(s.second.get());
@@ -78,9 +79,11 @@ void Scene::render() {
             const auto& o = objects[i];
             auto s = loader.get(o->shaderName);
             notify(UpdateValueInfo(EventType::SET_SHADER_FLASHLIGHT, flashlight));
-            glStencilFunc(GL_ALWAYS, i + 1, 0xFF);
+            glStencilFunc(GL_ALWAYS, i, 0xFF);
             o->draw_object(s);
         }
+
+        glStencilFunc(GL_ALWAYS, -1, 0xFF);
 
         // glfw: swap buffers and poll IO events (keys pressed/released, mouse moved etc.)
         // -------------------------------------------------------------------------------
@@ -192,6 +195,11 @@ void Scene::mouse_clicked(int button, int action, int mods) {
         plant_tree();
         return;
     }
+
+    if (button == 1) {
+        delete_obj();
+        return;
+    }
 }
 
 void Scene::plant_tree() {
@@ -201,5 +209,17 @@ void Scene::plant_tree() {
     obj.set_scale(0.3);
     obj.set_position(coords);
     add_object(std::move(obj));
+}
+
+void Scene::delete_obj() {
+    auto pair = get_clicked_obj();
+    auto i = pair.first;
+    if (glm::distance(pair.second, camera.get_pos()) > 100.0) {
+        return;
+    }
+
+    if (i != -1 && i < objects.size()) {
+        objects.erase(objects.begin() + i);
+    }
 }
 
