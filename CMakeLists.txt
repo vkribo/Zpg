@@ -38,7 +38,7 @@ add_executable(zpg
         source/main.cpp
         source/Shader.cpp
         source/Model.cpp
-        source/DrawableObject.cpp source/Scene.cpp source/Transformation.cpp source/Observer.cpp source/Camera.cpp source/ShaderLoader.cpp source/Texture.cpp source/Skybox.cpp)
+        source/DrawableObject.cpp source/Scene.cpp source/Transformation.cpp source/Observer.cpp source/Camera.cpp source/ShaderLoader.cpp source/Texture.cpp source/Skybox.cpp source/Animation.cpp)
 target_link_libraries(zpg
         ${OPENGL_LIBRARY} # filled by "find_package(OpenGL REQUIRED)"
         ${GLFW_LIBRARY}

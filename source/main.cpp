@@ -132,6 +132,7 @@ int main()
     DrawableObject second_house(house, "phong");
     second_house.set_texture(t);
     second_house.set_position(glm::vec3(20, 0.0, 0.0));
+    second_house.add_animation(std::make_unique<RepeatedLineMovement>(glm::vec3(1,1,1), 10));
     scene.add_object(std::move(second_house));
     Model terrain;
     terrain.load("assets/terrain/teren.obj");

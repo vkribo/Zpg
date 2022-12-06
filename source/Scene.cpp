@@ -1,6 +1,7 @@
 #include "Scene.h"
 
 #include <glm/ext/matrix_projection.hpp>
+#include <chrono>
 
 Scene::Scene(GLFWwindow *window) :
         window(window),
@@ -53,6 +54,7 @@ void Scene::render() {
     notify(UpdateValueInfo(EventType::SET_SHADER_SPOT_LIGHTS, spot_lights));
 
     skybox = Skybox(loader.get("skybox"));
+    auto start = std::chrono::high_resolution_clock::now();
     while (!glfwWindowShouldClose(window))
     {
         int newWidth, newHeight;
@@ -62,6 +64,14 @@ void Scene::render() {
             scr_height = newHeight;
             projection = glm::perspective(glm::radians(45.0f), (float)scr_width / (float)scr_height, 0.1f, 1000.0f);
             notify(UpdateValueInfo(EventType::SET_SHADER_PROJECTION, projection));
+        }
+
+        auto current = std::chrono::high_resolution_clock::now();
+        auto deltaTime = current - start;
+        if (std::chrono::duration_cast<std::chrono::microseconds>(deltaTime).count() > 1666) {
+            for (auto& o : objects) {
+                o->step_animation();
+            }
         }
 
         // input

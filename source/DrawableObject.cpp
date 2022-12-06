@@ -41,3 +41,17 @@ void DrawableObject::set_rotation(glm::vec3 rotation) {
 void DrawableObject::set_texture(Texture tex) {
     texture = tex;
 }
+
+void DrawableObject::step_animation() {
+    for (const auto& a : animations) {
+        a->step(*this);
+    }
+}
+
+glm::vec3 DrawableObject::get_position() {
+    return position;
+}
+
+void DrawableObject::add_animation(std::unique_ptr<Animation>&& animation) {
+    animations.push_back(std::move(animation));
+}
